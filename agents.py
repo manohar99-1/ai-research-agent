@@ -1,8 +1,39 @@
-import pdfplumber
+from langchain.chat_models import ChatOpenAI
 
-def extract_text_from_pdf(file_path):
-    text = ""
-    with pdfplumber.open(file_path) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() + "\n"
-    return text
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+def analyzer_agent(text):
+    prompt = f"""
+    Extract:
+    - problem
+    - methodology
+    - experiments
+    - findings
+    
+    Paper:
+    {text[:8000]}
+    
+    Return JSON.
+    """
+    return llm.predict(prompt)
+
+def summary_agent(text):
+    prompt = f"""
+    Summarize this paper in 150-200 words:
+    {text[:8000]}
+    """
+    return llm.predict(prompt)
+
+def citation_agent(text):
+    prompt = f"""
+    Extract all citations/references from:
+    {text[-5000:]}
+    """
+    return llm.predict(prompt)
+
+def insights_agent(text):
+    prompt = f"""
+    Give key insights and applications:
+    {text[:8000]}
+    """
+    return llm.predict(prompt)
